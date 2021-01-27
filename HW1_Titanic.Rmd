@@ -52,6 +52,13 @@ While you are expected to do this assignment as an individual, it is okay if two
 
 # Homework 1
 
+## Importing Packages
+
+```{r}
+library(dplyr)
+```
+
+
 ## Loading Data Set
 
 ```{r}
@@ -71,33 +78,57 @@ str(titanic)
 ## How deadly was the event? (2 points)
 
 ```{r}
+# Finding the proportion of survivors on Titanic
+
 dead_or_not <- round(prop.table(table(titanic$Survived)), digits = 3)
+dead_percent <- dead_or_not[1] * 100
 dead_or_not
 ```
+
+From the table above, we can see the majority of people who were on the Titanic died. In fact `r dead_percent`% of the passengers on the Titanic died.
 
 ## Did they make an effort to save women and children first? (2 points)
 
 ```{r}
+# Creating a new column to identify kids
+
 titanic$Child <- 0
 titanic$Child[titanic$Age<18] <- 1
 
+# Finding survival based on sex
+
 sex_table <- round(prop.table(table(titanic$Sex, titanic$Survived), 1), digits = 3)
+female_percent_alive <- sex_table[1, 2] * 100
+male_percent_alive <- sex_table[2, 2] * 100
+
+# Finding survival based on age
+
 age_table <- round(prop.table(table(titanic$Child, titanic$Survived), 1), digits = 3)
+adult_percent_alive <- age_table[1, 2] * 100
+child_percent_alive <- age_table[2, 2] * 100
 
 sex_table
 age_table
 ```
 
+From these two morbid tables, we can infer that women and children were prioritized over men. About `r female_percent_alive`% of women survived the Titanic and `r child_percent_alive`% survived, while only `r male_percent_alive`% and only `r adult_percent_alive`% survived. That is quite the stark contrast.
+
 ## Did the passengers who were in higher fare class survive at higher rates? (2 points)
 
 ```{r}
+# Creating a new fare column to classify richer passengers
+
 titanic$Fare2<-"30+" #default 
 titanic$Fare2[titanic$Fare < 30 & titanic$Fare >= 20] <- "20-30"
 titanic$Fare2[titanic$Fare < 20 & titanic$Fare >= 10] <- "10-20"
 titanic$Fare2[titanic$Fare < 10] <- "<10"
 
-breakdown2 <- aggregate(Survived ~ Fare2 + Sex, data=titanic,mean)
+# Aggregating the the fare data with sex
+
+breakdown2 <- aggregate(Survived ~ Fare2 + Sex, data=titanic, mean)
 breakdown2
+
+# Bar plot showing data
 
 barplot(breakdown2$Survived,
         col=breakdown2$Sex,
@@ -106,9 +137,81 @@ barplot(breakdown2$Survived,
                         breakdown2$Sex))
 ```
 
+From the bar plot, we can overwhelmingly see that women of all passengers types survived more than men. It does seem that the more you paid for your ticket, the more likely you were to survive, inferring that the Titanic crew prioritized the richer passengers over the poorer ones.
+
 ## Open Ended: What other conclusions can you draw about survival of passengers aboard the Titanic?
 
 ```{r}
+# Average and median age of all passengers who survived
 
+titanic_survive <- filter(titanic, Survived == 1)
+titanic_surive_mean <- round(mean(titanic_survive$Age, na.rm = TRUE), 2)
+titanic_surive_median <- round(median(titanic_survive$Age, na.rm = TRUE), 2)
+titanic_surive_mean 
+titanic_surive_median
+
+# Average and median age of all female passengers who survived
+
+titanic_survive_female <- filter(titanic, Survived == 1 & Sex == "female")
+titanic_surive_female_mean <- round(mean(titanic_survive_female$Age, na.rm = TRUE), 2)
+titanic_surive_female_median <- round(median(titanic_survive_female$Age, na.rm = TRUE), 2)
+titanic_surive_female_mean
+titanic_surive_female_median
+
+# Average and median age of all male passengers who survived
+
+titanic_survive_male <- filter(titanic, Survived == 1 & Sex == "male")
+titanic_surive_male_mean <- round(mean(titanic_survive_male$Age, na.rm = TRUE), 2)
+titanic_surive_male_median <- round(median(titanic_survive_male$Age, na.rm = TRUE), 2)
+titanic_surive_male_mean
+titanic_surive_male_median
 ```
 
+```{r}
+# Average and median age of all dead passengers
+
+titanic_dead <- filter(titanic, Survived == 0)
+titanic_dead_mean <- round(mean(titanic_dead$Age, na.rm = TRUE), 2)
+titanic_dead_median <- round(median(titanic_dead$Age, na.rm = TRUE), 2)
+titanic_dead_mean
+titanic_dead_median
+
+# Average and median age of all dead female passengers
+
+titanic_dead_female <- filter(titanic, Survived == 0 & Sex == "female")
+titanic_dead_female_mean <- round(mean(titanic_dead_female$Age, na.rm = TRUE), 2)
+titanic_dead_female_median <- round(median(titanic_dead_female$Age, na.rm = TRUE), 2)
+titanic_dead_female_mean
+titanic_dead_female_median
+
+# Average and median age of all dead male passengers
+
+titanic_dead_male <- filter(titanic, Survived == 0 & Sex == "male")
+titanic_dead_male_mean <- round(mean(titanic_dead_male$Age, na.rm = TRUE), 2)
+titanic_dead_male_median <- round(median(titanic_dead_male$Age, na.rm = TRUE), 2)
+titanic_dead_male_mean
+titanic_dead_male_median
+```
+
+```{r}
+# Average and median age of all passengers
+
+titanic_avg_age <- round(mean(titanic$Age, na.rm = TRUE), 2)
+titanic_median_age <- round(median(titanic$Age, na.rm = TRUE), 2)
+
+titanic_avg_age
+titanic_median_age
+```
+
+I decided to find the average ages of everyone from the Titanic, as well as the average age of females and males who survived and of females and males who died. The average age of all passengers on the Titanic was `r titanic_avg_age`. We can see from `r titanic_surive_mean` that a lot of the older passengers who brought the average age up died during the crash. The average age of female survivors was `r titanic_surive_female_mean` and the average age of male survivors was `r titanic_surive_male_mean`. From this, we can see that older women/women of all ages were allowed to enter lifeboats, while the male age shows us that mostly male children were a large portion of the survivors. 
+
+We can see the above analysis from the average age of dead male and female passengers. The dead male average was `r titanic_dead_male_mean`, which is in line with the survivors age, showing us a majority of the dead males were older. The age of dead females was quite low, `r titanic_dead_female_mean`, showing us that quite a few females of all ages survived.
+
+```{r}
+# Proportion of adults with kids who lived/died 
+
+kids_table <- round(prop.table(table(titanic$Parch, titanic$Survived), 1), digits = 3)
+kids_table
+```
+
+Finally, I was curious how having kids affected a person's survival. It seems that has the number of kids went up to three, the survival rate of the parent went up, but as the number of kids went from three to six, we saw the survival rate of parents mostly go to zero. I'd infer that the adults with more kids were giving up their seats on the lifeboats to ensure that their kids had enough space, causing them to die in the process. As for the increasing survival rate for people with three kids, I assume that's because they wanted to make sure most children didn't end up orphans.
