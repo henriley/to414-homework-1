@@ -1,0 +1,114 @@
+---
+title: 'TO414 - Winter 2021 - Homework Assignment #1'
+author: "Riley Maher"
+date: "1/31/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Titanic Data Exploration
+
+For this homework submission, you are asked to explore passenger survival data for the Titanic.
+
+### Specific Questions
+
+Specifically, you are asked to provide answers to the following questions:
+
+1. How deadly was the event? (2 points)
+2. Did they make an effort to save women and children first? (2 points)
+3. Did the passengers who were in higher fare class survive at higher rates? (2 points)
+4. Open Ended: What other conclusions can you draw about survival of passengers aboard the Titanic? (4 points)
+
+### Submission Format
+
+Please submit one RMarkdown document that has your source code and an HTML document that is the output from the RMD document. 
+
+In your submission, please do *not* respond with bare R output only. Please make sure you provide text interpretation and explanation of R outputs. Be sure to include ample comments in your R script file.
+
+Please note that the look and feel of your submission **matters**. We are building our outputs to be persuasive to a non-technical audience (*likely your boss in your next job*). You can't just show up with a bunch of code - they need to be well explained and output needs to be well interpreted for your audience.
+
+### Resources Provided
+
+- The data file for this HW is posted along with this file. Look for `titanic.csv`
+- You would want to look through bunch of sample code provided in the R Script file named: `TO414_Lab_Titanic.R`. The script has much more code than you need for this homework - use the file to explore different ways of working with the Titanic data.
+- The class presentation files for Wed 09/02 and Mon 09/07 classes has bunch of code and helpful hints that may prove useful to you as well.
+
+## Assignment Submission Policies
+
+Please note the following submission policies and keep them in mind as you work on your assignments.
+
+### Late Submission
+
+Submissions will remain open for 1 week after the submission deadline. However, for each full day of delay, you will lose 1 point as late submission penalty. Minor delays (few minutes) will be ignored. 
+
+### Student Collaboration
+
+While you are expected to do this assignment as an individual, it is okay if two people decide to work together and collaborate. If you do decide to collaborate with someone then please clearly identify in your submission who you worked with. Note that you should have full understanding of your submission even if the submission was created in collaboration.
+
+> This HW assignment is due EoD Sun 09/13.
+
+# Homework 1
+
+## Loading Data Set
+
+```{r}
+titanic <- read.csv("titanic.csv", stringsAsFactors = TRUE)
+```
+
+## Viewing Data Set
+
+```{r}
+head(titanic)
+```
+
+```{r}
+str(titanic)
+```
+
+## How deadly was the event? (2 points)
+
+```{r}
+dead_or_not <- round(prop.table(table(titanic$Survived)), digits = 3)
+dead_or_not
+```
+
+## Did they make an effort to save women and children first? (2 points)
+
+```{r}
+titanic$Child <- 0
+titanic$Child[titanic$Age<18] <- 1
+
+sex_table <- round(prop.table(table(titanic$Sex, titanic$Survived), 1), digits = 3)
+age_table <- round(prop.table(table(titanic$Child, titanic$Survived), 1), digits = 3)
+
+sex_table
+age_table
+```
+
+## Did the passengers who were in higher fare class survive at higher rates? (2 points)
+
+```{r}
+titanic$Fare2<-"30+" #default 
+titanic$Fare2[titanic$Fare < 30 & titanic$Fare >= 20] <- "20-30"
+titanic$Fare2[titanic$Fare < 20 & titanic$Fare >= 10] <- "10-20"
+titanic$Fare2[titanic$Fare < 10] <- "<10"
+
+breakdown2 <- aggregate(Survived ~ Fare2 + Sex, data=titanic,mean)
+breakdown2
+
+barplot(breakdown2$Survived,
+        col=breakdown2$Sex,
+        legend=rownames(breakdown2),
+        names.arg=paste(breakdown2$Fare2,
+                        breakdown2$Sex))
+```
+
+## Open Ended: What other conclusions can you draw about survival of passengers aboard the Titanic?
+
+```{r}
+
+```
+
